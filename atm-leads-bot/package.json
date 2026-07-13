@@ -1,0 +1,18 @@
+{
+  "name": "atm-leads-bot",
+  "version": "1.0.0",
+  "description": "Finds businesses and buildings that want or need an ATM",
+  "type": "module",
+  "bin": {
+    "atm-leads": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "scan": "node src/index.js scan",
+    "report": "node src/index.js report",
+    "test": "node src/test-scorer.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -2,6 +2,11 @@
   "name": "hanibalai-website",
   "version": "1.0.0",
   "type": "module",
+  "scripts": {
+    "atm-leads": "node atm-leads-bot/src/index.js scan",
+    "atm-leads:demo": "node atm-leads-bot/src/index.js demo",
+    "atm-leads:report": "node atm-leads-bot/src/index.js report"
+  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0"
   }

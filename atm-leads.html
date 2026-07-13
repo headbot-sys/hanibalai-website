@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATM Leads — Hannibal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg0: #0a0a0f;
+      --bg1: #12121a;
+      --line: #2a2a3a;
+      --gold: #d4a843;
+      --ink: #f0e6cc;
+      --muted: rgba(240, 230, 204, 0.68);
+      --high: #3d9a6a;
+      --medium: #c4a035;
+      --low: #6b6b7a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Source Sans 3", sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(212, 168, 67, 0.16), transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, rgba(61, 154, 106, 0.1), transparent 50%),
+        linear-gradient(180deg, #0c0c14 0%, var(--bg0) 45%, #0b0d12 100%);
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 22px 48px;
+      border-bottom: 1px solid var(--line);
+    }
+    .logo {
+      font-family: "Cormorant Garamond", serif;
+      letter-spacing: 0.18em;
+      color: var(--gold);
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    nav a { color: var(--muted); text-decoration: none; margin-left: 24px; font-size: 0.92rem; }
+    nav a:hover { color: var(--ink); }
+    .hero {
+      padding: 72px 48px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+      animation: rise 0.7s ease-out both;
+    }
+    h1 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      color: var(--gold);
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+    .hero p {
+      max-width: 640px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1.05rem;
+    }
+    .stats {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+      animation: rise 0.8s 0.1s ease-out both;
+    }
+    .stat strong {
+      display: block;
+      font-family: "Cormorant Garamond", serif;
+      font-size: 2rem;
+      color: var(--gold);
+    }
+    .stat span { color: var(--muted); font-size: 0.85rem; letter-spacing: 0.04em; }
+    .toolbar {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 48px 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      animation: rise 0.8s 0.15s ease-out both;
+    }
+    .chip {
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font: inherit;
+    }
+    .chip.active, .chip:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .feed {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 12px 48px 80px;
+      display: grid;
+      gap: 16px;
+      animation: rise 0.9s 0.2s ease-out both;
+    }
+    .lead {
+      background: rgba(18, 18, 26, 0.88);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--low);
+      border-radius: 4px;
+      padding: 22px 24px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .lead:hover { border-color: rgba(212, 168, 67, 0.55); transform: translateY(-1px); }
+    .lead.tier-high { border-left-color: var(--high); }
+    .lead.tier-medium { border-left-color: var(--medium); }
+    .lead.tier-low { border-left-color: var(--low); }
+    .lead header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .badge {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.72rem;
+      color: var(--gold);
+      border: 1px solid rgba(212, 168, 67, 0.35);
+      padding: 4px 8px;
+    }
+    .meta { color: var(--muted); font-size: 0.85rem; }
+    .lead h3 { font-size: 1.15rem; margin-bottom: 8px; font-weight: 600; }
+    .lead h3 a { color: var(--ink); text-decoration: none; }
+    .lead h3 a:hover { color: var(--gold); }
+    .lead p { color: var(--muted); line-height: 1.65; font-size: 0.95rem; }
+    .empty { color: var(--muted); padding: 40px 0; }
+    footer {
+      border-top: 1px solid var(--line);
+      text-align: center;
+      padding: 28px;
+      color: rgba(240, 230, 204, 0.4);
+      font-size: 0.82rem;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 700px) {
+      nav, .hero, .toolbar, .feed { padding-left: 22px; padding-right: 22px; }
+      .hero { padding-top: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="logo" href="/">HANNIBAL</a>
+    <div>
+      <a href="/">Home</a>
+      <a href="/atm-leads.html">ATM Leads</a>
+      <a href="mailto:headbot@hanibalai.com">Contact</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <h1>ATM Leads</h1>
+    <p>
+      Live scan of public signals — Reddit, news, Craigslist, and web search —
+      for businesses and buildings that look like they want an ATM on site.
+      Generated 2026-07-13T22:58:47.037Z.
+    </p>
+    <div class="stats">
+      <div class="stat"><strong>45</strong><span>QUALIFIED LEADS</span></div>
+      <div class="stat"><strong>0</strong><span>HIGH INTENT</span></div>
+      <div class="stat"><strong>43</strong><span>MEDIUM INTENT</span></div>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <button class="chip active" data-filter="all">All</button>
+    <button class="chip" data-filter="high">High</button>
+    <button class="chip" data-filter="medium">Medium</button>
+    <button class="chip" data-filter="low">Low</button>
+  </div>
+
+  <section class="feed" id="feed">
+    
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/336605818" target="_blank" rel="noopener noreferrer">The Elephant Room — potential ATM host (bar)</a></h3>
+          <p>bar in Austin · 315 Congress Avenue Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/358532219" target="_blank" rel="noopener noreferrer">Exxon Tigermart — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/436633130" target="_blank" rel="noopener noreferrer">Chevron — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/530786307" target="_blank" rel="noopener noreferrer">The Aristocrat — potential ATM host (bar)</a></h3>
+          <p>bar in Austin · 6507 Burnet Road Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/530786552" target="_blank" rel="noopener noreferrer">Lala's — potential ATM host (bar)</a></h3>
+          <p>bar in Austin · 2207 Justin Lane. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/530954513" target="_blank" rel="noopener noreferrer">Take 5 Oil Change — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/530963345" target="_blank" rel="noopener noreferrer">Chevron Gas — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin · 2909 West Anderson Lane Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/534450403" target="_blank" rel="noopener noreferrer">Shell — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/534455649" target="_blank" rel="noopener noreferrer">Back — potential ATM host (bar)</a></h3>
+          <p>bar in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/564536584" target="_blank" rel="noopener noreferrer">Reids Cleaner and Laundry — potential ATM host (laundry)</a></h3>
+          <p>laundry in Austin · 150 Brodie Lane. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/822469573" target="_blank" rel="noopener noreferrer">Latchkey — potential ATM host (bar)</a></h3>
+          <p>bar in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/862104465" target="_blank" rel="noopener noreferrer">Valero — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/862104476" target="_blank" rel="noopener noreferrer">Conoco — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/882493049" target="_blank" rel="noopener noreferrer">WhipIn — potential ATM host (restaurant)</a></h3>
+          <p>restaurant in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/919327546" target="_blank" rel="noopener noreferrer">The Highball — potential ATM host (bar)</a></h3>
+          <p>bar in Austin · 1120 South Lamar Boulevard Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/919330532" target="_blank" rel="noopener noreferrer">Texaco — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/919333660" target="_blank" rel="noopener noreferrer">David's Food — potential ATM host (convenience)</a></h3>
+          <p>convenience in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/919342408" target="_blank" rel="noopener noreferrer">Hu La Hu Market 2 — potential ATM host (convenience)</a></h3>
+          <p>convenience in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/919361277" target="_blank" rel="noopener noreferrer">Smart Stop — potential ATM host (convenience)</a></h3>
+          <p>convenience in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/919378095" target="_blank" rel="noopener noreferrer">Shell — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1037771638" target="_blank" rel="noopener noreferrer">Texaco FoodMart — potential ATM host (convenience)</a></h3>
+          <p>convenience in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1236792984" target="_blank" rel="noopener noreferrer">Yogurt Planet — potential ATM host (convenience)</a></h3>
+          <p>convenience in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1257573761" target="_blank" rel="noopener noreferrer">Zip-N — potential ATM host (convenience)</a></h3>
+          <p>convenience in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1477370200" target="_blank" rel="noopener noreferrer">Valero — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1477389966" target="_blank" rel="noopener noreferrer">Exxon — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1477389975" target="_blank" rel="noopener noreferrer">Chevron — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1477389976" target="_blank" rel="noopener noreferrer">Shell — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1477428951" target="_blank" rel="noopener noreferrer">Texaco — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1477428952" target="_blank" rel="noopener noreferrer">Conoco — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1477428965" target="_blank" rel="noopener noreferrer">Exxon — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1477428969" target="_blank" rel="noopener noreferrer">Shell — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1477428971" target="_blank" rel="noopener noreferrer">Shell — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1479713176" target="_blank" rel="noopener noreferrer">Texaco — potential ATM host (fuel)</a></h3>
+          <p>fuel in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1481420720" target="_blank" rel="noopener noreferrer">The 13th Floor — potential ATM host (bar)</a></h3>
+          <p>bar in Austin · 711 Red River Street Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1481633303" target="_blank" rel="noopener noreferrer">Dirty Dog Bar — potential ATM host (bar)</a></h3>
+          <p>bar in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1481633307" target="_blank" rel="noopener noreferrer">Pete's Dueling Piano Bar — potential ATM host (bar)</a></h3>
+          <p>bar in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1481633318" target="_blank" rel="noopener noreferrer">Mooseknuckle — potential ATM host (bar)</a></h3>
+          <p>bar in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1481633328" target="_blank" rel="noopener noreferrer">Blind Pig — potential ATM host (bar)</a></h3>
+          <p>bar in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1481633334" target="_blank" rel="noopener noreferrer">Shakespeare's — potential ATM host (bar)</a></h3>
+          <p>bar in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 40</span>
+            <span class="meta">osm · Austin</span>
+          </header>
+          <h3><a href="https://www.openstreetmap.org/node/1481633338" target="_blank" rel="noopener noreferrer">311 — potential ATM host (bar)</a></h3>
+          <p>bar in Austin. Cash-heavy venue type often suited for ATM placement. Confirm interest before outreach.</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 35</span>
+            <span class="meta">news · Los Angeles</span>
+          </header>
+          <h3><a href="https://news.google.com/rss/articles/CBMinwFBVV95cUxNcHBZUGdtSmhSSE5ibTlGdVZ6Nk1kbFl0ei1zcmFiSUlBaHEzeWdDMGY1bWFYZ0VsekFmb0dCVTViNUlzVXF3MkhXNFFBMjRZMjlVX3d0Y3ZuREVuSEx3dFIzZlhPTHhvRVFCZlBnM094QjFyNTdpVDJGNTV6bzBsT1djMTZxclVRMHRPbW9wSVV2M29JZ001RTkxVGdQSjjSAaQBQVVfeXFMTXV5djZMSjZIZEV5bGU4c0E3NHI4NHNtUFpKeV9fMUdfRXFJdF9FZUpXb2ZzdXV5RWZieHRqSzVobW9TSDhXQzA0ZmFLdks5V0lUcjh3TWd6bFMxQkhIdUh2TEtYcHlBeXp5VF9FRktSWXQxYVRHYlA2UHIwcnBQR1VUZUZIN182SFVTTnFNMWk5QzlHNVZyMkpnSjNaTTl4cEdmOFo?oc=5" target="_blank" rel="noopener noreferrer">26 cash points available in Liverpool for when you really need an ATM - Liverpool Echo</a></h3>
+          <p>26 cash points available in Liverpool for when you really need an ATM &amp;nbsp;&amp;nbsp; Liverpool Echo</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 35</span>
+            <span class="meta">news · Los Angeles</span>
+          </header>
+          <h3><a href="https://news.google.com/rss/articles/CBMi3wFBVV95cUxQbU1tWUwzMEZvQU5JNW5tTFZjLWpkOThPR0RxQWJZZ0pxMTVkb21Za0J0MlNsSE9LdXhqVjQtZnQ4RTE1aTJUMkd0QUQ1WS0zQmw2YzNTTGlZRzEzOUtBSmlxZktaVTE1LVcxeDd2UmU1c3B2MkZmYTN6SXplVkRRcWZ2bm5ubndZa3lwOTd4c3ptbnQxWUdmMXJaQXJweVd6Z0dPYmlhOURJU2JSSlNVdUVaQWpsZmZVc2RDTEc0RFYwcjh6Z0hjQkowNWxlcXBUOE90TlJobjMtWlVfcmdN?oc=5" target="_blank" rel="noopener noreferrer">Trio updates ATM prospectus; $3.29M placement shares left, $6.89M max aggregate offering - TradingView</a></h3>
+          <p>Trio updates ATM prospectus; $3.29M placement shares left, $6.89M max aggregate offering &amp;nbsp;&amp;nbsp; TradingView</p>
+        </article>
+
+        <article class="lead tier-medium">
+          <header>
+            <span class="badge">medium · 35</span>
+            <span class="meta">news · New York</span>
+          </header>
+          <h3><a href="https://news.google.com/rss/articles/CBMirAFBVV95cUxNM1hhaEtPSUs2QkhhTHRiUF90LTV1UWFfaW9SSXY2Z2FaQmh4R3phdXU1WUhUeTNWNjI0QnhYMEs4dlhiNmJCOTZ0QkJkZ1p3RnNMVU1ZTW9LOXlHNXRqSFI5OS1VV1U3UW5LWWE2dUFUZ0RuN0FESU1YaVBSc0VVRTdHMjJyS1R5VDF6UXVDZno1Y2ROYzN2ZEdQVWVYMkxkWXBrbTl6UEhqbEd4?oc=5" target="_blank" rel="noopener noreferrer">ATM operator closes thousands of locations after being strangled by regulation — including in California - New York Post</a></h3>
+          <p>ATM operator closes thousands of locations after being strangled by regulation — including in California &amp;nbsp;&amp;nbsp; New York Post</p>
+        </article>
+
+        <article class="lead tier-low">
+          <header>
+            <span class="badge">low · 15</span>
+            <span class="meta">news · Austin</span>
+          </header>
+          <h3><a href="https://news.google.com/rss/articles/CBMibkFVX3lxTE1TemthT2Z6RkZvaGs0cmJJRXBFRmE2MHc4UWpjdkZnN2cyQ0pWMFhtNEo1Ylo0STAzWTdtYURvRWVSVmVTWkI1X2hSUWtJN0JqUC1aWjV6elg4NFpLbk1aMDU5bFpNa3FJX0ZFVERB?oc=5" target="_blank" rel="noopener noreferrer">Timewise Extends ATM Agreement With Cardtronics - Convenience Store News</a></h3>
+          <p>Timewise Extends ATM Agreement With Cardtronics &amp;nbsp;&amp;nbsp; Convenience Store News</p>
+        </article>
+
+        <article class="lead tier-low">
+          <header>
+            <span class="badge">low · 15</span>
+            <span class="meta">news · Los Angeles</span>
+          </header>
+          <h3><a href="https://news.google.com/rss/articles/CBMiqAFBVV95cUxOcDV2YlhtZDIzMnhLczQwaXNVdW9pdzc2V1lrRW9ySzdZNUVjdXVTTzc5Ml9tek5oMjhUeVlRaU9ld2FwZnltQ055NGNsVnhYbkw5OVNtT2VnY2I2bnI4TG45MzlnWEYydUd5Q1ZBdXJ2d3k2TkVJVVMxdW41WUl0dDV1TnpQbVIxcV9TSEFqamdLZnJjOTJXTEI1OVF3UjFFUGRnQ0t0TmY?oc=5" target="_blank" rel="noopener noreferrer">Why Adding Bitcoin to Your ATM in 2026 Is a Revenue Move, Not a Risk - ATM Marketplace</a></h3>
+          <p>Why Adding Bitcoin to Your ATM in 2026 Is a Revenue Move, Not a Risk &amp;nbsp;&amp;nbsp; ATM Marketplace</p>
+        </article>
+  </section>
+
+  <footer>© 2026 Hannibal AI · ATM Leads Bot · Public sources only · Respect site terms when scraping</footer>
+
+  <script>
+    const chips = document.querySelectorAll('.chip');
+    const leads = document.querySelectorAll('.lead');
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        chips.forEach((c) => c.classList.remove('active'));
+        chip.classList.add('active');
+        const f = chip.dataset.filter;
+        leads.forEach((el) => {
+          const show = f === 'all' || el.classList.contains('tier-' + f);
+          el.style.display = show ? '' : 'none';
+        });
+      });
+    });
+  </script>
+</body>
+</html>
