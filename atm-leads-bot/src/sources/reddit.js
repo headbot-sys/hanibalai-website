@@ -4,11 +4,15 @@ import { enrichLead } from '../scorer.js';
 
 const QUERY_BATCH = INTENT_QUERIES.slice(0, 6);
 
-async function scrapeRedditJson({ limit = 25 } = {}) {
+async function scrapeRedditJson({ limit = 25, places = [] } = {}) {
   const leads = [];
   const seen = new Set();
+  const queries = [...QUERY_BATCH];
+  for (const place of places) {
+    queries.push(`looking for ATM ${place}`, `need an ATM ${place}`, `host an ATM ${place}`);
+  }
 
-  for (const q of QUERY_BATCH) {
+  for (const q of queries) {
     const url =
       `https://www.reddit.com/search.json?q=${encodeURIComponent(q)}` +
       `&sort=new&limit=${Math.min(limit, 25)}&t=year&type=link`;
@@ -60,13 +64,16 @@ async function scrapeRedditJson({ limit = 25 } = {}) {
  * When Reddit JSON is blocked (common on datacenter IPs), fall back to
  * Bing/Google news RSS filtered to reddit.com discussions.
  */
-async function scrapeRedditViaNews() {
+async function scrapeRedditViaNews({ places = [] } = {}) {
   const leads = [];
   const seen = new Set();
   const queries = [
     'site:reddit.com "looking for ATM" OR "need an ATM" OR "host an ATM"',
     'site:reddit.com "ATM placement" OR "ATM for my" (store OR bar OR restaurant)',
   ];
+  for (const place of places) {
+    queries.push(`site:reddit.com ATM (looking OR need OR host) ${place}`);
+  }
 
   for (const q of queries) {
     const urls = [
@@ -112,5 +119,5 @@ export async function scrapeReddit(options = {}) {
   const primary = await scrapeRedditJson(options);
   if (primary.length) return primary;
   console.warn('[reddit] direct API empty/blocked — trying news fallback…');
-  return scrapeRedditViaNews();
+  return scrapeRedditViaNews(options);
 }

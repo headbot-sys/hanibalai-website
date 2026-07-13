@@ -50,12 +50,21 @@ async function fetchRss(source, url, query) {
 
 /**
  * Google News + Bing News RSS (no API keys).
+ * @param {{ places?: string[] }} [opts]
  */
-export async function scrapeNews() {
+export async function scrapeNews({ places = [] } = {}) {
   const leads = [];
   const seen = new Set();
 
-  for (const q of QUERIES) {
+  const queries = [...QUERIES];
+  for (const place of places) {
+    queries.push(
+      `"ATM" (${place}) (placement OR host OR "looking for" OR "need an") -theft -skimmer`,
+      `ATM placement OR "host an ATM" OR "need an ATM" ${place}`
+    );
+  }
+
+  for (const q of queries) {
     const googleUrl =
       `https://news.google.com/rss/search?q=${encodeURIComponent(q)}` +
       `&hl=en-US&gl=US&ceid=US:en`;
@@ -65,6 +74,9 @@ export async function scrapeNews() {
       for (const lead of await fetchRss('news', googleUrl, q)) {
         if (seen.has(lead.url)) continue;
         seen.add(lead.url);
+        if (places.length) {
+          lead.location = lead.location || places[0];
+        }
         leads.push(lead);
       }
     } catch (err) {
@@ -75,6 +87,9 @@ export async function scrapeNews() {
       for (const lead of await fetchRss('bing-news', bingUrl, q)) {
         if (seen.has(lead.url)) continue;
         seen.add(lead.url);
+        if (places.length) {
+          lead.location = lead.location || places[0];
+        }
         leads.push(lead);
       }
     } catch (err) {

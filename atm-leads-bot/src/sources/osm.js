@@ -3,10 +3,11 @@ import { setTimeout as sleep } from 'node:timers/promises';
 
 /** City centers used for Overpass “around” queries (lat, lon, radius meters). */
 export const OSM_AREAS = [
+  { name: 'Austin', lat: 30.2672, lon: -97.7431, radius: 14000 },
   { name: 'Houston', lat: 29.7604, lon: -95.3698, radius: 12000 },
+  { name: 'Dallas', lat: 32.7767, lon: -96.797, radius: 10000 },
   { name: 'Miami', lat: 25.7617, lon: -80.1918, radius: 10000 },
   { name: 'Chicago', lat: 41.8781, lon: -87.6298, radius: 10000 },
-  { name: 'Dallas', lat: 32.7767, lon: -96.797, radius: 10000 },
   { name: 'Atlanta', lat: 33.749, lon: -84.388, radius: 10000 },
 ];
 
@@ -31,7 +32,7 @@ function buildQuery(area) {
 (
 ${unions}
 );
-out body 80;
+out body 120;
 `.trim();
 }
 

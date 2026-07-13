@@ -6,7 +6,7 @@ import { scrapeReddit } from './sources/reddit.js';
 import { scrapeNews } from './sources/news.js';
 import { scrapeCraigslist } from './sources/craigslist.js';
 import { scrapeWeb } from './sources/web.js';
-import { scrapeOsmCandidates } from './sources/osm.js';
+import { OSM_AREAS, scrapeOsmCandidates } from './sources/osm.js';
 import { loadLeads, mergeLeads, saveLeads, OUTPUT_DIR, ensureOutputDir } from './store.js';
 import { generateDashboardHtml } from './report.js';
 import { DEMO_LEADS } from './demo-leads.js';
@@ -24,14 +24,14 @@ Usage:
 
 Options:
   --sources=reddit,news,craigslist,web,osm   Comma list (default: all)
-  --metros=nyc,la,chicago                Craigslist metros only
-  --min-tier=low|medium|high             Filter saved output (default: low)
-  --fresh                                Replace stored leads instead of merging
-  --demo                                 Seed with sample leads (no network)
+  --metros=austin,houston,dallas             Limit Craigslist + OSM + localized news
+  --min-tier=low|medium|high                 Filter saved output (default: low)
+  --fresh                                    Replace stored leads instead of merging
+  --demo                                     Seed with sample leads (no network)
 
 Examples:
   npm run scan
-  node src/index.js scan --sources=reddit,news --min-tier=medium
+  node src/index.js scan --metros=austin --sources=osm,news,craigslist --fresh
   node src/index.js demo
 `);
 }
@@ -41,6 +41,7 @@ function parseArgs(argv) {
     command: 'scan',
     sources: DEFAULT_SOURCES,
     metros: METROS,
+    metrosFiltered: false,
     minTier: 'low',
     demo: false,
     fresh: false,
@@ -62,7 +63,10 @@ function parseArgs(argv) {
         .slice('--metros='.length)
         .split(',')
         .map((s) => s.trim().toLowerCase());
-      args.metros = METROS.filter((m) => ids.includes(m.id) || ids.includes(m.craigslist));
+      args.metros = METROS.filter(
+        (m) => ids.includes(m.id) || ids.includes(m.craigslist) || ids.includes(m.name.toLowerCase())
+      );
+      args.metrosFiltered = true;
     } else if (a.startsWith('--min-tier=')) {
       args.minTier = a.slice('--min-tier='.length).toLowerCase();
     } else if (!a.startsWith('-')) {
@@ -74,13 +78,23 @@ function parseArgs(argv) {
   return args;
 }
 
+function osmAreasForMetros(metros, filtered) {
+  if (!filtered) return OSM_AREAS;
+  const names = new Set(metros.map((m) => m.name.toLowerCase()));
+  return OSM_AREAS.filter((a) => names.has(a.name.toLowerCase()));
+}
+
 const TIER_RANK = { noise: 0, low: 1, medium: 2, high: 3 };
 
 async function runScan(args) {
   console.log('🐘 ATM Leads Bot — scanning public sources…');
   console.log(`   Sources: ${args.sources.join(', ')}`);
+  if (args.metrosFiltered) {
+    console.log(`   Metros: ${args.metros.map((m) => m.name).join(', ')}`);
+  }
 
   let found = [];
+  const places = args.metrosFiltered ? args.metros.map((m) => m.name) : [];
 
   if (args.demo || args.command === 'demo') {
     console.log('   Mode: demo (sample leads)');
@@ -88,13 +102,13 @@ async function runScan(args) {
   } else {
     if (args.sources.includes('reddit')) {
       process.stdout.write('   → Reddit… ');
-      const r = await scrapeReddit();
+      const r = await scrapeReddit({ places });
       console.log(`${r.length} hits`);
       found.push(...r);
     }
     if (args.sources.includes('news')) {
-      process.stdout.write('   → Google News RSS… ');
-      const n = await scrapeNews();
+      process.stdout.write('   → News RSS… ');
+      const n = await scrapeNews({ places });
       console.log(`${n.length} hits`);
       found.push(...n);
     }
@@ -106,13 +120,14 @@ async function runScan(args) {
     }
     if (args.sources.includes('web')) {
       process.stdout.write('   → DuckDuckGo… ');
-      const w = await scrapeWeb();
+      const w = await scrapeWeb({ places });
       console.log(`${w.length} hits`);
       found.push(...w);
     }
     if (args.sources.includes('osm')) {
-      process.stdout.write('   → OpenStreetMap venues… ');
-      const o = await scrapeOsmCandidates();
+      const areas = osmAreasForMetros(args.metros, args.metrosFiltered);
+      process.stdout.write(`   → OpenStreetMap venues (${areas.map((a) => a.name).join(', ') || 'default'})… `);
+      const o = await scrapeOsmCandidates({ areas: areas.length ? areas : OSM_AREAS });
       console.log(`${o.length} hits`);
       found.push(...o);
     }

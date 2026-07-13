@@ -6,12 +6,20 @@ const QUERIES = INTENT_QUERIES.slice(0, 5);
 
 /**
  * DuckDuckGo HTML results via POST (GET often returns an empty shell).
+ * @param {{ places?: string[] }} [opts]
  */
-export async function scrapeWeb() {
+export async function scrapeWeb({ places = [] } = {}) {
   const leads = [];
   const seen = new Set();
 
-  for (const q of QUERIES) {
+  const queries = [...QUERIES];
+  for (const place of places) {
+    for (const base of QUERIES.slice(0, 3)) {
+      queries.push(`${base} ${place}`);
+    }
+  }
+
+  for (const q of queries) {
     const url = 'https://html.duckduckgo.com/html/';
     try {
       const body = new URLSearchParams({ q });
@@ -70,6 +78,7 @@ export async function scrapeWeb() {
           title,
           url: href,
           snippet: snippet.slice(0, 400),
+          location: places[0] || null,
           query: q,
         });
         if (lead.tier !== 'noise') leads.push(lead);

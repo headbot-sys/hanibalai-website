@@ -54,6 +54,15 @@ Each hit is scored from title + snippet:
 - **Low** — weak ATM context
 - **Noise** — vendor sales pitches, job posts (often down-ranked/dropped)
 
+# Austin Metro (example)
+```bash
+node src/index.js scan --metros=austin --sources=osm,news,craigslist,web --fresh
+```
+
+Austin is included in Craigslist metros (`austin.craigslist.org`) and OSM
+coverage centered on downtown (14 km radius — covers South Congress, East
+Austin, Domain, Round Rock fringe).
+
 ## Notes on source availability
 
 Some hosts (Reddit, Craigslist) block datacenter IPs. On a home/office network

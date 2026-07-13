@@ -66,4 +66,17 @@ export const DEMO_LEADS = [
     reasons: ['downrank:vendor-pitch'],
     query: 'ATM',
   },
+  {
+    id: 'demo-6',
+    source: 'osm',
+    title: 'East Austin bar row — potential ATM host corridor',
+    url: 'https://www.openstreetmap.org/#map=14/30.2672/-97.7431',
+    snippet:
+      'Cash-heavy nightlife and convenience corridor in Austin TX. Strong foot traffic for ATM placement outreach.',
+    location: 'Austin',
+    score: 40,
+    tier: 'medium',
+    reasons: ['candidate:cash-heavy-venue'],
+    query: 'osm:austin',
+  },
 ];

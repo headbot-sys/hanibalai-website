@@ -43,6 +43,7 @@ export const METROS = [
   { id: 'la', name: 'Los Angeles', craigslist: 'losangeles' },
   { id: 'chicago', name: 'Chicago', craigslist: 'chicago' },
   { id: 'houston', name: 'Houston', craigslist: 'houston' },
+  { id: 'austin', name: 'Austin', craigslist: 'austin' },
   { id: 'miami', name: 'Miami', craigslist: 'miami' },
   { id: 'dallas', name: 'Dallas', craigslist: 'dallas' },
   { id: 'phoenix', name: 'Phoenix', craigslist: 'phoenix' },
