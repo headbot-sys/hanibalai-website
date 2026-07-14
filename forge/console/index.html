@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forge — Workstation Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="rail">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div>
+          <div class="brand-name">Forge</div>
+          <div class="brand-sub">Hannibal AI</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <button class="nav-item active" data-view="dashboard">Overview</button>
+        <button class="nav-item" data-view="devices">Devices</button>
+        <button class="nav-item" data-view="jobs">Jobs</button>
+        <button class="nav-item" data-view="alerts">Alerts</button>
+        <button class="nav-item" data-view="groups">Groups</button>
+        <button class="nav-item" data-view="enroll">Enrollment</button>
+      </nav>
+      <div class="rail-foot">
+        <div class="status-pill" id="server-status">Connecting…</div>
+        <button class="ghost-btn" id="refresh-btn" type="button">Refresh</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="view-title">Overview</h1>
+          <p class="muted" id="view-subtitle">Fleet health across your managed workstations</p>
+        </div>
+        <div class="topbar-actions">
+          <input id="search" class="search" type="search" placeholder="Search hostname, IP, user…" />
+          <button class="primary-btn" id="new-job-btn" type="button">Run script</button>
+        </div>
+      </header>
+
+      <section id="view-root" class="view"></section>
+    </main>
+  </div>
+
+  <dialog id="job-dialog" class="modal">
+    <form method="dialog" id="job-form" class="modal-card">
+      <header>
+        <h2>Run remote script</h2>
+        <p class="muted">Queued to selected devices; agents pick up on next heartbeat.</p>
+      </header>
+      <label>Target devices
+        <select id="job-devices" multiple size="6"></select>
+      </label>
+      <label>Title
+        <input id="job-title" type="text" placeholder="Disk usage check" required />
+      </label>
+      <label>Shell
+        <select id="job-shell">
+          <option value="auto">Auto</option>
+          <option value="bash">Bash</option>
+          <option value="cmd">CMD</option>
+          <option value="powershell">PowerShell</option>
+        </select>
+      </label>
+      <label>Script
+        <textarea id="job-payload" rows="8" required placeholder="df -h"></textarea>
+      </label>
+      <footer class="modal-actions">
+        <button value="cancel" class="ghost-btn" type="submit">Cancel</button>
+        <button id="job-submit" value="default" class="primary-btn" type="submit">Queue job</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="device-dialog" class="modal wide">
+    <div class="modal-card">
+      <header class="modal-head">
+        <div>
+          <h2 id="device-title">Device</h2>
+          <p class="muted" id="device-sub"></p>
+        </div>
+        <button class="ghost-btn" type="button" id="close-device">Close</button>
+      </header>
+      <div id="device-detail" class="device-detail"></div>
+    </div>
+  </dialog>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
