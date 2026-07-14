@@ -5,3 +5,6 @@ data/*.db-*
 .DS_Store
 *.log
 .forge-agent/
+__pycache__/
+*.pyc
+.venv/
