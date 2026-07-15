@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { consoleRouter, agentRouter } from './routes.js';
+import { downloadRouter } from './downloads.js';
 import './db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -17,13 +18,14 @@ app.get('/api/health', (_req, res) => {
   res.json({ ok: true, service: 'forge-rmm', version: '0.1.0' });
 });
 
+app.use('/download', downloadRouter);
 app.use('/api/v1/console', consoleRouter);
 app.use('/api/v1/agent', agentRouter);
 
 const consoleDist = path.join(__dirname, '..', '..', 'console', 'dist');
 if (fs.existsSync(consoleDist)) {
   app.use(express.static(consoleDist));
-  app.get(/^\/(?!api).*/, (_req, res) => {
+  app.get(/^\/(?!api|download).*/, (_req, res) => {
     res.sendFile(path.join(consoleDist, 'index.html'));
   });
 }
@@ -36,4 +38,5 @@ app.use((err, _req, res, _next) => {
 app.listen(PORT, () => {
   console.log(`Forge RMM server listening on http://localhost:${PORT}`);
   console.log(`Console API key: ${process.env.FORGE_CONSOLE_KEY || 'forge-dev-console-key'}`);
+  console.log(`Windows agent: http://localhost:${PORT}/download/windows-agent`);
 });

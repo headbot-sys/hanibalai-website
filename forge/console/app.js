@@ -471,6 +471,19 @@ async function renderEnroll(root) {
   const key = keys[0];
   const site = sites[0];
 
+  let windows = null;
+  try {
+    const qs = key?.key_value ? `?key=${encodeURIComponent(key.key_value)}` : '';
+    const res = await fetch(`/download/windows-agent${qs}`);
+    if (res.ok) windows = await res.json();
+  } catch {
+    windows = null;
+  }
+
+  const winUrl = windows?.download_url || `${window.location.origin}/download/windows-agent.ps1`;
+  const silent = windows?.silent_install
+    || `powershell -NoProfile -ExecutionPolicy Bypass -Command "iex (irm '${winUrl}')"`;
+
   root.innerHTML = '';
   root.appendChild(el(`
     <div class="panels">
@@ -486,18 +499,29 @@ async function renderEnroll(root) {
         </div>
       </section>
       <section class="panel">
-        <div class="panel-head"><h3>Install agent</h3></div>
+        <div class="panel-head"><h3>Windows agent link</h3></div>
         <div style="padding:18px">
-          <p class="muted" style="margin-bottom:12px">On each workstation:</p>
-          <div class="code-block">python3 forge_agent.py enroll \\
-  --server http://YOUR_SERVER:8787 \\
-  --key ${escapeHtml(key?.key_value || 'ENROLLMENT_KEY')}
-
-python3 forge_agent.py run</div>
-          <p class="muted" style="margin-top:14px">Agent path: <span class="mono">forge/agent/forge_agent.py</span></p>
+          <p class="muted" style="margin-bottom:12px">Silent install (Administrator PowerShell) — no App Store:</p>
+          <div class="code-block" id="win-silent">${escapeHtml(silent)}</div>
+          <div class="toolbar" style="margin-top:14px">
+            <a class="primary-btn" href="${escapeHtml(winUrl)}" download="windows-agent.ps1">Download Windows agent</a>
+            <button class="ghost-btn" id="copy-win" type="button">Copy install command</button>
+          </div>
+          <p class="muted" style="margin-top:14px">Installs to <span class="mono">Program Files\\ForgeAgent</span> and starts scheduled task <span class="mono">ForgeAgent</span>.</p>
         </div>
       </section>
     </div>
+    <section class="panel" style="margin-top:16px">
+      <div class="panel-head"><h3>Other platforms (Python agent)</h3></div>
+      <div style="padding:18px">
+        <div class="code-block">python3 forge_agent.py enroll \\
+  --server ${escapeHtml(windows?.server || 'http://YOUR_SERVER:8787')} \\
+  --key ${escapeHtml(key?.key_value || 'ENROLLMENT_KEY')}
+
+python3 forge_agent.py run</div>
+        <p class="muted" style="margin-top:14px">Agent path: <span class="mono">forge/agent/forge_agent.py</span></p>
+      </div>
+    </section>
   `));
 
   root.querySelector('#new-key')?.addEventListener('click', async () => {
@@ -507,6 +531,17 @@ python3 forge_agent.py run</div>
       body: JSON.stringify({ site_id: site.id, label: `Key ${new Date().toLocaleString()}` }),
     });
     render();
+  });
+
+  root.querySelector('#copy-win')?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(silent);
+      const btn = root.querySelector('#copy-win');
+      btn.textContent = 'Copied';
+      setTimeout(() => { btn.textContent = 'Copy install command'; }, 1500);
+    } catch {
+      alert('Copy failed — select the command manually.');
+    }
   });
 }
 

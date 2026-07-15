@@ -9,7 +9,8 @@ Built as an open, self-hosted MVP by **Hannibal AI**.
 | Component | Path | Role |
 |-----------|------|------|
 | **Server** | `server/` | REST API, SQLite store, policy & job queue |
-| **Agent** | `agent/forge_agent.py` | Endpoint agent (enroll, heartbeat, inventory, job runner) |
+| **Agent** | `agent/forge_agent.py` | Cross-platform Python agent |
+| **Windows agent** | `agent/windows/` | PowerShell agent + silent installer (download link) |
 | **Console** | `console/` | Admin web UI for fleet operations |
 
 ### Capabilities
@@ -60,7 +61,24 @@ npm run seed
 npm run dev   # both server + console via concurrently
 ```
 
-### 3. Enroll a real machine
+### 3. Enroll a Windows PC (silent — no App Store)
+
+From **Enrollment** in the console, copy the install command, or:
+
+```powershell
+# Elevated PowerShell
+iex (irm 'http://YOUR_SERVER:8787/download/windows-agent.ps1?key=YOUR_KEY')
+```
+
+Links:
+
+- Metadata: `GET /download/windows-agent?key=...`
+- Silent installer script: `GET /download/windows-agent.ps1?key=...`
+- Agent script only: `GET /download/forge_agent.ps1`
+
+Installs to `Program Files\ForgeAgent` and registers scheduled task `ForgeAgent` (runs at startup as SYSTEM).
+
+### 4. Enroll Mac / Linux (Python agent)
 
 ```bash
 cd agent
