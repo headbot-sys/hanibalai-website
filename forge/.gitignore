@@ -1,0 +1,10 @@
+node_modules/
+dist/
+data/*.db
+data/*.db-*
+.DS_Store
+*.log
+.forge-agent/
+__pycache__/
+*.pyc
+.venv/

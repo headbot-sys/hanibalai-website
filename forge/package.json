@@ -1,0 +1,19 @@
+{
+  "name": "forge-rmm",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Forge — workstation management (RMM/MDM) by Hannibal AI",
+  "scripts": {
+    "install:all": "npm install --prefix server && npm install --prefix console",
+    "dev": "concurrently -n server,console -c teal,amber \"npm run dev --prefix server\" \"npm run dev --prefix console\"",
+    "dev:server": "npm run dev --prefix server",
+    "dev:console": "npm run dev --prefix console",
+    "seed": "npm run seed --prefix server",
+    "build": "npm run build --prefix console",
+    "start": "npm start --prefix server",
+    "smoke": "bash scripts/smoke.sh"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
